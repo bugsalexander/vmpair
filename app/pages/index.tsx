@@ -1,13 +1,12 @@
-import useSWR from "swr";
-import ApiClient, { ROUTES } from "../common/apiClient";
 import { Header } from "../components/Header";
+import { useWelcome } from "../hooks/useWelcome";
 
 export default function Home() {
-  const { data } = useSWR(ROUTES.WELCOME, ApiClient.getWelcome);
+  const data = useWelcome();
 
   return (
     <>
-      <Header text={`Hey ${data?.data.name}! Welcome to VMpair`} />
+      <Header page="home" text={`Hey ${data?.name}! Welcome to VMpair`} />
     </>
   );
 }
