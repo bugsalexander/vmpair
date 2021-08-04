@@ -1,4 +1,9 @@
 @import "./globals";
 
 // components
-@import "./Header";
+@import "./components/Header";
+@import "./components/Layout";
+@import "./components/MeetingBox";
+
+// pages
+@import "./pages/index";

@@ -10,6 +10,7 @@ const sampleResponse: WelcomeApiResponse = {
     partnerStatus: "notYetIndicated",
   },
   nextPairing: new Date(2021, 8, 25, 12, 0),
+  willBeAttending: "notYetIndicated"
 };
 
 export default function handler(

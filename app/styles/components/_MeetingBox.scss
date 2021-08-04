@@ -1,0 +1,19 @@
+.meetingbox {
+  border: black solid 1px;
+
+  padding: 25px;
+  margin-bottom: 1em;
+
+  &__togglebox {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__toggle {
+    margin-left: 20px;
+  }
+
+  &__nobottommargin {
+    margin-bottom: 0;
+  }
+}

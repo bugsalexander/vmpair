@@ -10,6 +10,7 @@ export type WelcomeApiResponse = {
     partnerStatus: "yes" | "no" | "notYetIndicated";
   };
   nextPairing: Date;
+  willBeAttending: "yes" | "no" | "notYetIndicated";
 };
 
 export type PreferencesApiRequest = {
