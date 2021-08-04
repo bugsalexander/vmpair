@@ -1,4 +1,4 @@
-from flask import Flask, Response
+from flask import Flask, Response, session, request
 import json
 import config
 import mysql.connector
@@ -6,8 +6,9 @@ import mysql.connector
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = 'This is not a secure secret. Remember to change me in the future!'
 
-@app.route("/api/v1/test/")
+@app.route("/api/v1/test")
 def hello_world():
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
         print("I connected to the database that was created after I ran 'docker-compose up -d'!")
@@ -20,7 +21,17 @@ def hello_world():
         print(type(result))
         return json.dumps(str(result)) 
 
-@app.route("/api/v1/welcome/", methods=['GET'])
+@app.route("/api/v1/login", methods=["POST"])
+def login():
+    ''' Update stored info about person currently logged in
+    email: string
+    password: string
+    '''
+    session['email'] = request.form['email']
+
+    return json.dumps({'status': 200, 'msg': 'session info updated'})
+
+@app.route("/api/v1/welcome", methods=['GET'])
 def get_welcome():
     ''' Return information for welcome page
     name: string
@@ -33,13 +44,13 @@ def get_welcome():
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
         mycursor = mydb.cursor()
         # Query name from the Users table using email
-        mycursor.execute(f"select full_name from users where email = '{config.EMAIL}';")
+        mycursor.execute(f"select full_name from users where email = '{session['email']}';")
         result = mycursor.fetchall()
         print("the result of the first query is", result)
         name = result[0][0]
 
         # Query next meeting info from Meetings table using email
-        mycursor.execute("select user_2_email, meeting_date, user_2_attending from meetings where user_1_email = 'bsusan@vmware.com';")
+        mycursor.execute(f"select user_2_email, meeting_date, user_2_attending from meetings where user_1_email = '{session['email']}';")
         result = mycursor.fetchall()
         print("the result of the second query is", result)
         (partnerEmail, nextMeetingTime, partnerStatus) = result[0]
@@ -65,12 +76,12 @@ def get_welcome():
             mimetype='application/json'
         )
 
-@app.route("/api/v1/welcome/", methods=['POST'])
+@app.route("/api/v1/welcome", methods=['POST'])
 def set_welcome():
     email = config.EMAIL
     # enter willBeAttending from welcome page into Meetings table using email
 
-@app.route("/api/v1/preferences/", methods=['GET'])
+@app.route("/api/v1/preferences", methods=['GET'])
 def get_preferences():
     ''' Return existing preferences
     name: string
@@ -113,7 +124,7 @@ def get_preferences():
             mimetype='application/json'
         )
 
-@app.route("/api/v1/preferences/", methods=['POST', 'PUT'])
+@app.route("/api/v1/preferences", methods=['POST', 'PUT'])
 def set_preferences(preferences):
     ''' Update existing preferences
     name: string
@@ -134,7 +145,7 @@ def set_preferences(preferences):
     # enter availabilityByDay, maxMeetingsPerWeek into Availability table
     return
 
-@app.route("/api/v1/stats/", methods=['GET'])
+@app.route("/api/v1/stats", methods=['GET'])
 def get_stats():
     ''' Return information for stats page
     totalPeopleMet: number
@@ -144,6 +155,7 @@ def get_stats():
         date: DateTime
     '''
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
+        # normally, user info like email would be extracted from a JWT, but since we're not doing auth, we'll hard-code email for now 
         email = config.EMAIL
 
         # Obtain the stats from Meetings table using email
