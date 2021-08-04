@@ -1,4 +1,4 @@
-from flask import Flask, Response, session, request
+from flask import Flask, Response, session, request, redirect
 import json
 import config
 import mysql.connector
@@ -34,7 +34,9 @@ def login():
     session['email'] = request.form['email']
     print(session['email'])
 
-    return json.dumps({'status': 200, 'msg': 'session info updated'})
+    # redirect the user to the home page after "logging in"
+    return "hi"
+    # return redirect('/welcome')
 
 @app.route("/api/v1/welcome", methods=['GET'])
 def get_welcome():
@@ -167,23 +169,32 @@ def get_stats():
     ''' Return information for stats page
     totalPeopleMet: number
     totalMeetings: number
-    peopleMet: object[] (only most recent 4)
-        name: string
-        date: DateTime
+    peopleMet: map<string<string>>
+        name (string): date (DateTime)
     '''
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
-        # normally, user info like email would be extracted from a JWT, but since we're not doing auth, we'll hard-code email for now 
-        email = config.EMAIL
+        # get all meetings that have happened for this person where both people said yes
 
-        # Obtain the stats from Meetings table using email
+        mycursor = mydb.cursor()
+        mycursor.execute(f'''SELECT meetings.meeting_date AS meeting_dates, users.full_name AS acquaintance_names
+        FROM meetings 
+        INNER JOIN users ON meetings.user_2_email = users.email
+        WHERE (meetings.user_1_email = '{session['email']}' OR meetings.user_2_email = '{session['email']}')
+            AND meetings.user_1_attending = TRUE 
+            AND meetings.user_2_attending = TRUE 
+            AND meetings.meeting_date < CURDATE();''')
+
+        all_people_met = mycursor.fetchall()
+
+        # create a map that maps an acquaintance's name to the last date they were met as a string
+        unique_people_met = {}
+        for person in all_people_met:
+            unique_people_met[person[1]] = str(person[0])
 
         result = {
-            "totalPeopleMet": number,
-            "totalMeetings": number,
-            "peopleMet": [{
-                "name": string,
-                "date": DateTime
-            }]
+            "totalPeopleMet": len(unique_people_met),
+            "totalMeetings": len(all_people_met),
+            "peopleMet": unique_people_met
         }
         return Response(
             json.dumps(result),
