@@ -1,0 +1,9 @@
+.index {
+  &__link {
+    font-style: italic;
+    display: inline;
+    &:hover {
+      color: blue;
+    }
+  }
+}
