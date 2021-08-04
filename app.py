@@ -14,7 +14,11 @@ def hello_world():
         print("I connected to the database that was created after I ran 'docker-compose up -d'!")
         
         mycursor = mydb.cursor()
-        mycursor.execute("select * from users where email = 'bsusan@vmware.com';")
+        session['email'] = config.EMAIL
+
+        mycursor.execute(
+            f"select * from meetings where (user_1_email = '{session['email']}' \
+            or user_2_email = '{session['email']}') and meeting_date > current_date;")
         
         result = mycursor.fetchall()
         print("the result of the query is", result)
@@ -28,6 +32,7 @@ def login():
     password: string
     '''
     session['email'] = request.form['email']
+    print(session['email'])
 
     return json.dumps({'status': 200, 'msg': 'session info updated'})
 
@@ -36,9 +41,9 @@ def get_welcome():
     ''' Return information for welcome page
     name: string
     nextMeeting:
-    name: string
-    date: DateTime
-    partnerStatus: string
+        name: string
+        date: DateTime
+        partnerStatus: string
     nextPairing: DateTime
     '''
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
@@ -78,8 +83,20 @@ def get_welcome():
 
 @app.route("/api/v1/welcome", methods=['POST'])
 def set_welcome():
-    email = config.EMAIL
-    # enter willBeAttending from welcome page into Meetings table using email
+    willBeAttending = request.json.get('willBeAttending')
+    # enter willBeAttending status from welcome page into Meetings table
+    with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
+        mycursor = mydb.cursor()
+        mycursor.execute(f"update meetings set user_1_attending = {willBeAttending} where user_1_email = '{session['email']}' \
+            and meeting_date > current_date;")
+        mycursor.execute(f"update meetings set user_2_attending = {willBeAttending} where user_2_email = '{session['email']}' \
+            and meeting_date > current_date;")
+        mydb.commit()
+        return Response(
+            json.dumps({"willBeAttending":willBeAttending}),
+            status=200,
+            mimetype='application/json'
+        )
 
 @app.route("/api/v1/preferences", methods=['GET'])
 def get_preferences():
