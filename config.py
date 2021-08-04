@@ -1,2 +1,1 @@
-EMAIL = "fhannah@vmware.com"
-
+EMAIL = "bsusan@vmware.com"
