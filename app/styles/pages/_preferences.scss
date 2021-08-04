@@ -1,0 +1,24 @@
+.preferences {
+  &__textinput {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+  }
+
+  &__inline {
+    display: inline;
+  }
+
+  &__input {
+    margin-left: auto;
+    width: 300px;
+  }
+
+  &__switch {
+    margin-left: 20px;
+  }
+
+  &__select {
+    margin-left: 10px;
+  }
+}
