@@ -46,4 +46,4 @@ CREATE TABLE `meetings` (
   PRIMARY KEY (`meeting_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `meetings` VALUES (null, 'bsusan@vmware.com', 'bzach@vmware.com', '2021-08-05', TRUE, TRUE);
+INSERT INTO `meetings` VALUES (null, 'bsusan@vmware.com', 'bzach@vmware.com', '2021-07-05', TRUE, TRUE);
