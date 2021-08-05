@@ -6,7 +6,7 @@ export type WelcomeApiResponse = {
   name: string;
   nextMeeting: {
     name: string;
-    date: string;
+    date: Date;
     partnerStatus: "yes" | "no" | "notYetIndicated";
   };
   nextPairing: Date;
