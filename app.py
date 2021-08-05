@@ -1,3 +1,4 @@
+import flask
 from flask import Flask, Response, session, request, redirect
 import json
 import config
@@ -7,6 +8,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'This is not a secure secret. Remember to change me in the future!'
+
+app.config['SESSION_COOKIE_PATH'] = 'http://localhost:3000'
+# app.config['SESSION_COOKIE_DOMAIN'] = 'localhost'
 
 @app.route("/api/v1/test")
 def hello_world():
@@ -32,22 +36,30 @@ def login():
     password: string
     '''
 
-    if request.method == "OPTIONS":
-        return Response(
-            headers={"Access-Control-Allow-Origin": "*"},
-            status=200,
-        )
+    resp = flask.Response()
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Headers'] = '*'
+    resp.headers['Access-Control-Allow-Methods'] = '*'
+    resp.headers['Access-Control-Allow-Credentials'] = "true"
 
-    session['email'] = request.json['email']
+    if request.method == 'OPTIONS':
+        resp.headers['Access-Control-Max-Age'] = 600
+        return resp
+    
+    resp.headers['Access-Control-Expose-Headers'] = 'Set-Cookie'
+    # session['email'] = request.json['email']
+    resp.set_cookie(key='foo', value='bar', path="/", samesite="None")
+
+    return resp
     # redirect the user to the home page after "logging in"
     # return redirect('/welcome')
-    return Response(     
-            headers={"Access-Control-Allow-Origin": "*"},
-            status=200,
-            mimetype='application/json'
-        )
+    # return Response(     
+    #         headers={"Access-Control-Allow-Origin": "*"},
+    #         status=200,
+    #         mimetype='application/json'
+        # )
 
-@app.route("/api/v1/welcome", methods=['GET'])
+@app.route("/api/v1/welcome", methods=['GET', 'OPTIONS'])
 def get_welcome():
     ''' Return information for welcome page
     name: string
@@ -57,6 +69,15 @@ def get_welcome():
         partnerStatus: string
     nextPairing: DateTime
     '''
+    resp = flask.Response()
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Headers'] = '*'
+    resp.headers['Access-Control-Allow-Methods'] = '*'
+
+    if request.method == 'OPTIONS':
+        resp.headers['Access-Control-Max-Age'] = 600
+        return resp
+
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
         mycursor = mydb.cursor()
         # Query name from the Users table using email
@@ -86,15 +107,26 @@ def get_welcome():
             },
             "nextPairing": 7 - datetime.now().weekday()
         }
-        return Response(
-            json.dumps(result),
-            headers={"Access-Control-Allow-Origin": "*"},
-            status=200,
-            mimetype='application/json'
-        )
+        resp.status_code = 200
+        resp.response = "it worked"
+        return resp
+        # return Response(
+        #     json.dumps(result),
+        #     headers={"Access-Control-Allow-Origin": "*"},
+        #     status=200,
+        #     mimetype='application/json'
+        # )
 
-@app.route("/api/v1/welcome", methods=['POST'])
+@app.route("/api/v1/welcome", methods=['POST', 'OPTIONS'])
 def set_welcome():
+    resp = flask.Response()
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Headers'] = '*'
+    resp.headers['Access-Control-Allow-Methods'] = '*'
+
+    if request.method == "OPTIONS":
+        return resp
+
     willBeAttending = request.json.get('willBeAttending')
     # enter willBeAttending status from welcome page into Meetings table
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
@@ -104,12 +136,16 @@ def set_welcome():
         mycursor.execute(f"update meetings set user_2_attending = {willBeAttending} where user_2_email = '{session['email']}' \
             and meeting_date > current_date;")
         mydb.commit()
-        return Response(
-            json.dumps({"willBeAttending":willBeAttending}),
-            headers={"Access-Control-Allow-Origin": "*"},
-            status=200,
-            mimetype='application/json'
-        )
+    
+    resp.status_code = 200
+    resp.response = "it worked"
+    return resp
+    # return Response(
+    #     json.dumps({"willBeAttending":willBeAttending}),
+    #     headers={"Access-Control-Allow-Origin": "*"},
+    #     status=200,
+    #     mimetype='application/json'
+    # )
 
 @app.route("/api/v1/preferences", methods=['GET'])
 def get_preferences():

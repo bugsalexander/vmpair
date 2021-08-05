@@ -15,7 +15,7 @@ export const ROUTES = {
 };
 
 const baseURL =
-  process.env.NODE_ENV === "production" ? undefined : "http://localhost:5000";
+  process.env.NODE_ENV === "production" ? undefined : "http://127.0.0.1:5000";
 
 const ApiClient = {
   getWelcome: () => axios.get<WelcomeApiResponse>(ROUTES.WELCOME, { baseURL }),
