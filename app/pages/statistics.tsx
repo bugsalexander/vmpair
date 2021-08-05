@@ -13,12 +13,12 @@ export default function Home() {
       <div className="statistics__flex">
         <div className="statistics__inline">
           {data?.peopleMet.map((meeting) =>
-            <div className="statistics__entry">{meeting.name}</div>
+            <div key={meeting.date.toString()} className="statistics__entry">{meeting.name}</div>
           )}
         </div>
         <div className="statistics__inline">
           {data?.peopleMet.map((meeting) =>
-            <div className="statistics__entry">{meeting.date}</div>
+            <div key={meeting.date.toString()} className="statistics__entry">{meeting.date}</div>
           )}
         </div>
       </div>
