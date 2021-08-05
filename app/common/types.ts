@@ -6,11 +6,11 @@ export type WelcomeApiResponse = {
   name: string;
   nextMeeting: {
     partnerName: string;
-    date: string;
+    time: string;
     partnerStatus: number;
   };
   nextPairing: Date;
-  willBeAttending: "yes" | "no" | "notYetIndicated";
+  willBeAttending: boolean;
 };
 
 export type PreferencesApiRequest = {

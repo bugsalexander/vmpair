@@ -4,21 +4,31 @@ import { MeetingBox } from "../components/MeetingBox";
 import { Switch } from "antd";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ApiClient from "../common/apiClient";
+import { WelcomeApiResponse } from "../common/types";
 
 export default function Home() {
-  const data = useWelcome();
-  const [canAttend, setCanAttend] = useState("");
+  const [data, setData] = useState<WelcomeApiResponse | null>(null);
+  const [canAttend, setCanAttend] = useState(false);
 
   useEffect(() => {
-    setCanAttend(data?.willBeAttending!);
-    console.log("setting can attend to", data?.willBeAttending);
-  }, [data?.willBeAttending]);
+    ApiClient.getWelcome().then((data) => {
+      setData(data.data);
+      setCanAttend(!!data.data.willBeAttending);
+    });
+  }, []);
 
   return (
     <>
       <Header page="home" text={`Hey ${data?.name}! Welcome to VMpair`} />
       <MeetingBox meeting={data?.nextMeeting} nextPairing={data?.nextPairing}>
-        <Switch />
+        <Switch
+          checked={canAttend}
+          onChange={() => {
+            setCanAttend(!canAttend);
+            ApiClient.postWelcome({ willBeAttending: !canAttend });
+          }}
+        />
       </MeetingBox>
       <p>
         To change your scheduled meeting frequency,{" "}

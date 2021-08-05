@@ -44,7 +44,7 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
         <>
           <p>
             You are currently paired to meet with {meeting.partnerName} on{" "}
-            {meeting.date}
+            {meeting.time}
           </p>
           <div className="meetingbox__togglebox">
             <p>Will you be attending?</p>
