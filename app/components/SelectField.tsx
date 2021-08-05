@@ -29,15 +29,17 @@ type SelectFieldProps = {
     toggled: boolean;
   }>;
   dispatch: (v: string) => void;
+  className?: string;
 };
 
 export const SelectField: React.FC<SelectFieldProps> = ({
   name,
   options,
   dispatch,
+  className,
 }) => {
   return (
-    <div>
+    <div className={"selectfield " + className}>
       <p>{name}</p>
       {options.map((opt) => (
         <SelectButton
