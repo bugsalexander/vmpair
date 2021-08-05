@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { StatsApiResponse } from "../../common/types";
+import { StatsApiResponse } from "../../../common/types";
 
 const data: StatsApiResponse = {
   peopleMet: [
