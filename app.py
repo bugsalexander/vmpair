@@ -78,6 +78,7 @@ def get_welcome():
         }
         return Response(
             json.dumps(result),
+            headers={"Access-Control-Allow-Origin": "*"},
             status=200,
             mimetype='application/json'
         )
@@ -95,6 +96,7 @@ def set_welcome():
         mydb.commit()
         return Response(
             json.dumps({"willBeAttending":willBeAttending}),
+            headers={"Access-Control-Allow-Origin": "*"},
             status=200,
             mimetype='application/json'
         )
@@ -115,29 +117,60 @@ def get_preferences():
     maxMeetingsPerWeek: number
     '''
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
-        email = config.EMAIL
-
         # Query name, preferredPronouns, doesWantMatching from Users table
 
         # From availability table:
         # Query daysFreeToMeet, then use that to get availabilityByDay
         # Query maxMeetingsPerWeek
 
+        with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
+            mycursor = mydb.cursor()
+            mycursor.execute(f'''SELECT *
+            FROM users
+            INNER JOIN days_of_week_availability AS avail ON users.email = avail.email 
+            WHERE users.email = '{session['email']}';''')
+
+            preferences_record = mycursor.fetchone()
+            print('preferences_record is', preferences_record)
+            fullName, preferredPronouns, email, role, team, dateStarted, doesWantMatching, sameEmail, maxMeetingsPerWeek, mondayTimesStr, mondayCanVirtual, mondayCanInPerson, tuesdayTimesStr, tuesdayCanVirtual, tuesdayCanInPerson, wednesdayTimesStr, wednesdayCanVirtual, wednesdayCanInPerson, thursdayTimesStr, thursdayCanVirtual, thursdayCanInPerson, fridayTimesStr, fridayCanVirtual, fridayCanInPerson = preferences_record
+
         result = {
-            "name": name,
-            "preferredPronouns": string,
-            "email": string,
-            "doesWantMatching": boolean,
-            "daysFreeToMeet": [string],
-            "availabilityByDay": {
-                "times": [string],
-                "canVirtual": boolean,
-                "canInPerson": boolean
-            },
-            "maxMeetingsPerWeek": number
+            "name": fullName,
+            "preferredPronouns": preferredPronouns,
+            "email": email,
+            "doesWantMatching": doesWantMatching,
+            "availabilityByDay": [
+                    {
+                        "times": json.loads(mondayTimesStr),
+                        "canVirtual": True if mondayCanVirtual == 1 else False,
+                        "canInPerson": True if mondayCanInPerson == 1 else False
+                    },
+                    {
+                        "times": json.loads(tuesdayTimesStr),
+                        "canVirtual": True if tuesdayCanVirtual == 1 else False,
+                        "canInPerson": True if tuesdayCanInPerson == 1 else False
+                    },
+                    {
+                        "times": json.loads(wednesdayTimesStr),
+                        "canVirtual": True if wednesdayCanVirtual == 1 else False,
+                        "canInPerson": True if wednesdayCanInPerson == 1 else False
+                    },
+                    {
+                        "times": json.loads(thursdayTimesStr),
+                        "canVirtual": True if thursdayCanVirtual == 1 else False,
+                        "canInPerson": True if thursdayCanInPerson == 1 else False
+                    },
+                    {
+                        "times": json.loads(fridayTimesStr),
+                        "canVirtual": True if fridayCanVirtual == 1 else False,
+                        "canInPerson": True if fridayCanInPerson == 1 else False
+                    }             
+                ],
+            "maxMeetingsPerWeek": maxMeetingsPerWeek
         }
         return Response(
             json.dumps(result),
+            headers={"Access-Control-Allow-Origin": "*"},
             status=200,
             mimetype='application/json'
         )
@@ -171,6 +204,7 @@ def set_preferences():
         if len(preferences_record) > 1: 
             return Response(json.dumps({'msg': 'you cannot have more than one user per email'}), status=404, mimetyple='application/json')
         if len(preferences_record) == 1:
+            print("len is", len(preferences_record))
             # update the user record
             mycursor = mydb.cursor()
             mycursor.execute(f'''UPDATE users
@@ -179,36 +213,45 @@ def set_preferences():
                 users.does_want_matching = {request.json['doesWantMatching']}
             WHERE users.email = '{session['email']}';''')
 
+            mydb.commit()
+
             # update the days_of_week_availability record
             mycursor = mydb.cursor()
             mycursor.execute(f'''UPDATE days_of_week_availability
             SET days_of_week_availability.max_weekly_meetings = '{request.json['maxMeetingsPerWeek']}',
 
-                days_of_week_availability.monday_times = '{str(request.json['availabilityByDay'][0]['times'])}',
+                days_of_week_availability.monday_times = '{json.dumps(request.json['availabilityByDay'][0]['times'])}',
                 days_of_week_availability.monday_can_virtual = {request.json['availabilityByDay'][0]['canVirtual']},
                 days_of_week_availability.monday_can_in_person = {request.json['availabilityByDay'][0]['canInPerson']},
 
-                days_of_week_availability.tuesday_times = '{str(request.json['availabilityByDay'][1]['times'])}',
+                days_of_week_availability.tuesday_times = '{json.dumps(request.json['availabilityByDay'][1]['times'])}',
                 days_of_week_availability.tuesday_can_virtual = {request.json['availabilityByDay'][1]['canVirtual']},
                 days_of_week_availability.tuesday_can_in_person = {request.json['availabilityByDay'][1]['canInPerson']},
 
-                days_of_week_availability.wednesday_times = '{str(request.json['availabilityByDay'][2]['times'])}',
+                days_of_week_availability.wednesday_times = '{json.dumps(request.json['availabilityByDay'][2]['times'])}',
                 days_of_week_availability.wednesday_can_virtual = {request.json['availabilityByDay'][2]['canVirtual']},
                 days_of_week_availability.wednesday_can_in_person = {request.json['availabilityByDay'][2]['canInPerson']},
 
-                days_of_week_availability.thursday_times = '{str(request.json['availabilityByDay'][3]['times'])}',
+                days_of_week_availability.thursday_times = '{json.dumps(request.json['availabilityByDay'][3]['times'])}',
                 days_of_week_availability.thursday_can_virtual = {request.json['availabilityByDay'][3]['canVirtual']},
                 days_of_week_availability.thursday_can_in_person = {request.json['availabilityByDay'][3]['canInPerson']},
 
-                days_of_week_availability.friday_times = '{str(request.json['availabilityByDay'][4]['times'])}',
+                days_of_week_availability.friday_times = '{json.dumps(request.json['availabilityByDay'][4]['times'])}',
                 days_of_week_availability.friday_can_virtual = {request.json['availabilityByDay'][4]['canVirtual']},
                 days_of_week_availability.friday_can_in_person = {request.json['availabilityByDay'][4]['canInPerson']}
             WHERE days_of_week_availability.email = '{session['email']}';''')
+
+            mydb.commit()
         else:
             # insert the record
             # TODO
             pass
-    return Response(json.dumps({'msg': 'successfully updated preferences'}), status=200, mimetype='application/json') 
+    return Response(
+        json.dumps({'msg': 'successfully updated preferences'}), 
+        headers={"Access-Control-Allow-Origin": "*"},
+        status=200, 
+        mimetype='application/json'
+    ) 
 
 @app.route("/api/v1/stats", methods=['GET'])
 def get_stats():
@@ -244,6 +287,7 @@ def get_stats():
         }
         return Response(
             json.dumps(result),
+            headers={"Access-Control-Allow-Origin": "*"},
             status=200,
             mimetype='application/json'
         )
