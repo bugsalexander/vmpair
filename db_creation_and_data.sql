@@ -38,8 +38,8 @@ CREATE TABLE `days_of_week_availability` (
   PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `days_of_week_availability` VALUES ('bsusan@vmware.com', 3, '12:00, 1:00', TRUE, TRUE, '', FALSE, FALSE, '', FALSE, FALSE, '', FALSE, FALSE, '', FALSE, FALSE);
-INSERT INTO `days_of_week_availability` VALUES ('bzach@vmware.com', 2, '1:00, 2:00', TRUE, TRUE, '', FALSE, FALSE, '', FALSE, FALSE, '', FALSE, FALSE, '', FALSE, FALSE);
+INSERT INTO `days_of_week_availability` VALUES ('bsusan@vmware.com', 3, '12:00, 1:00', TRUE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE);
+INSERT INTO `days_of_week_availability` VALUES ('bzach@vmware.com', 2, '1:00, 2:00', TRUE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE);
 
 
 CREATE TABLE `meetings` (
