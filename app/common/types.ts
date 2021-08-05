@@ -5,9 +5,9 @@ export type WelcomeApiRequest = {
 export type WelcomeApiResponse = {
   name: string;
   nextMeeting: {
-    name: string;
-    date: Date;
-    partnerStatus: "yes" | "no" | "notYetIndicated";
+    partnerName: string;
+    date: string;
+    partnerStatus: number;
   };
   nextPairing: Date;
   willBeAttending: "yes" | "no" | "notYetIndicated";

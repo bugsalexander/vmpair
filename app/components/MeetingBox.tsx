@@ -15,7 +15,7 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
   if (!nextPairing) return null;
 
   // not scheduled or partner can't make it
-  const partnerCanceled = meeting?.partnerStatus === "no";
+  const partnerCanceled = meeting?.partnerStatus === 0;
   if (!meeting || partnerCanceled) {
     const date = new Date(nextPairing);
     const inDays = differenceInDays(new Date(), date);
@@ -23,7 +23,7 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
       <div className="meetingbox">
         {partnerCanceled ? (
           <p>
-            Your partner {meeting?.name} indicated they will not be able to make
+            Your partner {meeting?.partnerName} indicated they will not be able to make
             the meeting.
           </p>
         ) : (
@@ -43,16 +43,16 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
       {meeting ? (
         <>
           <p>
-            You are currently paired to meet with {meeting.name} on{" "}
-            {new Date(meeting.date).toString()}
+            You are currently paired to meet with {meeting.partnerName} on{" "}
+            {meeting.date}
           </p>
           <div className="meetingbox__togglebox">
             <p>Will you be attending?</p>
             <div className="meetingbox__toggle">{children}</div>
           </div>
           <p className="meetingbox__nobottommargin">
-            {meeting.name} has{" "}
-            {meeting.partnerStatus === "yes"
+            {meeting.partnerName} has{" "}
+            {meeting.partnerStatus === 1
               ? "accepted the meeting!"
               : "not yet indicated whether they will be able to make the meeting"}
           </p>

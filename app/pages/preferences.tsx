@@ -87,6 +87,11 @@ export default function Preferences() {
   const [pronouns, setPronouns] = useState<PronounValue>();
   const [doesWantMatching, setDoesWantMatching] = useState(false);
   const [daysFreeToMeet, daysFreeDispatch] = useReducer(daysFreeReducer, null);
+  const [diff, setDiff] = useState(false);
+  const withSetDiff = (f: any) => (v: any) => {
+    f(v);
+    setDiff(true);
+  };
 
   useEffect(() => {
     ApiClient.getPreferences().then((data) => {
@@ -102,14 +107,19 @@ export default function Preferences() {
   return (
     <>
       <Header page="preferences" text={`Edit my preferences!`} />
-      <FormField name="Name:" value={name} onChange={setName} />
-      <FormField name="Email:" value={email} onChange={setEmail} />
+      <FormField name="Name:" value={name} onChange={withSetDiff(setName)} />
+      <FormField
+        name="Email:"
+        value={email}
+        onChange={withSetDiff(setEmail)}
+        disabled
+      />
       <FormField name="Preferred pronouns:" value={pronouns}>
         <Select
           className="preferences__input"
           defaultValue={pronouns}
           value={pronouns}
-          onChange={setPronouns}
+          onChange={withSetDiff(setPronouns)}
         >
           {Object.entries(PRONOUNS).map(([_key, value]) => (
             <Select.Option key={value} value={value}>
@@ -122,7 +132,7 @@ export default function Preferences() {
         <Switch
           className="preferences__switch"
           checked={doesWantMatching}
-          onChange={() => setDoesWantMatching((v) => !v)}
+          onChange={withSetDiff(() => setDoesWantMatching((v) => !v))}
         />
       </FormField>
       <SelectField
@@ -178,7 +188,7 @@ export default function Preferences() {
         <Button
           className="preferences__buttonflex__button"
           type="primary"
-          disabled={!daysFreeToMeet?.diff}
+          disabled={!daysFreeToMeet?.diff && !diff}
           onClick={() => {
             daysFreeToMeet &&
               ApiClient.postPreferences({
@@ -204,6 +214,7 @@ export default function Preferences() {
               });
 
             daysFreeDispatch("save");
+            setDiff(false);
           }}
         >
           Save my preferences
