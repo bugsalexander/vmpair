@@ -1,0 +1,42 @@
+.login {
+  &__text {
+    margin-bottom: 1em;
+  }
+
+  &__flex {
+    display: flex;
+  }
+
+  &__labels {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    height: 150px;
+    justify-content: space-evenly;
+  }
+  
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    height: 150px;
+    justify-content: space-evenly;
+  }
+
+  &__subheader {
+    font-size: 1.5em;
+    margin-bottom: 1em;
+  }
+
+  &__input {
+    width: 320px;
+  }
+
+  &__button {
+    font-size: 1.5em;
+    margin: 1em;
+    &:hover {
+      color: blue;
+    }
+  }
+}

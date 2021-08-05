@@ -2,8 +2,8 @@ import { Input } from "antd";
 import { ChangeEventHandler } from "react";
 
 type FormFieldProps = {
-  name: string;
-  value: string | undefined;
+  name?: string;
+  value?: string | undefined;
   onChange?: (v: string) => void;
 };
 

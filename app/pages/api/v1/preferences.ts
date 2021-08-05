@@ -5,7 +5,7 @@ import { PreferencesApiResponse, WelcomeApiResponse } from "../../../common/type
 const sampleResponse: PreferencesApiResponse = {
   name: "Alex",
   preferredPronouns: "he/him/his",
-  email: "<email here>",
+  email: "alex@vmware.com",
   doesWantMatching: true,
   daysFreeToMeet: ["Monday", "Wednesday"],
   availabilityByDay: [

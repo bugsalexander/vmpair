@@ -14,7 +14,7 @@ const HButton: React.FC<HButtonProps> = ({ children, isDefault, onClick }) => {
   );
 };
 
-const PAGES = ["home", "preferences", "statistics"] as const;
+const PAGES = ["home", "preferences", "statistics", "login"] as const;
 type Pages = typeof PAGES[number];
 
 type HeaderProps = {
