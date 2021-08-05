@@ -13,7 +13,7 @@ export const ROUTES = {
   STATS: "/api/v1/stats",
 };
 
-const baseURL = "http://localhost:5000";
+const baseURL = "http://localhost:3000";
 
 const ApiClient = {
   getWelcome: () => axios.get<WelcomeApiResponse>(ROUTES.WELCOME, { baseURL }),

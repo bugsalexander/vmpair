@@ -1,0 +1,32 @@
+.statistics {
+  &__text {
+    display: flex;
+    align-items: center;
+    margin-top: 2em;
+    margin-bottom: 2em;
+  }
+
+  &__flex {
+    display: flex;
+  }
+
+  &__inline {
+    display: inline;
+    margin-left: 5em;
+  }
+
+  &__entry {
+    display: flex;
+    font-size: 1.5em;
+  }
+
+  &__label {
+    display: inline;
+  }
+  
+  &__value {
+    display: inline;
+    margin-left: 0.5em;
+    font-size: 2em;
+  }
+}
