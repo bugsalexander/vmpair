@@ -8,21 +8,28 @@ export default function Home() {
   return (
     <>
       <Header page="statistics" text={`Your stats:`} />
-      <NumberStat label="Number of people met: " value={data?.totalPeopleMet}/>
-      <NumberStat label="Recent meetings: "/>
+      <NumberStat label="Number of people met: " value={data?.totalPeopleMet} />
+      <NumberStat label="Recent meetings: " />
       <div className="statistics__flex">
-        <div className="statistics__inline">
-          {data?.peopleMet.map((meeting) =>
-            <div className="statistics__entry">{meeting.name}</div>
-          )}
-        </div>
-        <div className="statistics__inline">
-          {data?.peopleMet.map((meeting) =>
-            <div className="statistics__entry">{meeting.date}</div>
-          )}
-        </div>
+        {data &&
+          Object.entries(data.peopleMet).map(([name, date]) => {
+            return (
+              <>
+                <div className="statistics__inline">
+                  <div key={name} className="statistics__entry">
+                    {name}
+                  </div>
+                </div>
+                <div className="statistics__inline">
+                  <div key={date} className="statistics__entry">
+                    {date}
+                  </div>
+                </div>
+              </>
+            );
+          })}
       </div>
-      <NumberStat label="Total meetings: " value={data?.totalMeetings}/>
+      <NumberStat label="Total meetings: " value={data?.totalMeetings} />
     </>
   );
 }

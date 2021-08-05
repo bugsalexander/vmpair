@@ -2,18 +2,18 @@ import { Button } from "antd";
 import { useState } from "react";
 
 type LoginButtonProps = {
-  onChange?: () => void;
+  onClick?: () => void;
 };
 
 export const LoginButton: React.FC<LoginButtonProps> = ({
   children,
-  onChange,
+  onClick,
 }) => {
   return (
     <Button
-      className="preferences__select"
+      size={"large"}
       type={"default"}
-      onClick={onChange}
+      onClick={onClick}
     >
       {children}
     </Button>

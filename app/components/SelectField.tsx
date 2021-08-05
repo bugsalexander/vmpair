@@ -1,5 +1,7 @@
 import { Button } from "antd";
 import { useState } from "react";
+import { DAY } from "../common/types";
+import { DaysReducerState } from "../pages/preferences";
 
 type SelectButtonProps = {
   toggled: boolean;
@@ -28,7 +30,7 @@ type SelectFieldProps = {
     name: string;
     toggled: boolean;
   }>;
-  dispatch: (v: string) => void;
+  dispatch: (s: string) => void;
   className?: string;
 };
 

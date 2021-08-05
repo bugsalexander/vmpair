@@ -37,8 +37,17 @@
     }
 
     &__mode {
-      margin-left: auto;
+      margin-left: 20px;
       display: inline;
+    }
+  }
+
+  &__buttonflex {
+    display: flex;
+    margin-top: 1.5em;
+
+    &__button {
+      margin-left: auto;
     }
   }
 }

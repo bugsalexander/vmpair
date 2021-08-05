@@ -32,9 +32,16 @@
     width: 320px;
   }
 
-  &__button {
-    font-size: 1.5em;
-    margin: 1em;
+  &__forgot_password {
+    font-size: 0.8em;
+    margin-top: 1.5em;
+    margin-bottom: .5em;
+    &:hover {
+      color: blue;
+    }
+  }
+
+  &__create_account {
     &:hover {
       color: blue;
     }

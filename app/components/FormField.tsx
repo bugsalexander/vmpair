@@ -5,6 +5,7 @@ type FormFieldProps = {
   name?: string;
   value?: string | undefined;
   onChange?: (v: string) => void;
+  disabled?: boolean;
 };
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -12,12 +13,14 @@ export const FormField: React.FC<FormFieldProps> = ({
   value,
   children,
   onChange,
+  disabled
 }) => {
   return (
     <div className="preferences__textinput">
       <div className="preferences__inline">{name}</div>
       {children ?? (
         <Input
+          disabled={disabled}
           className="preferences__input"
           value={value}
           onChange={onChange ? (e) => onChange(e.target.value) : undefined}

@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({ text, page }) => {
       <h1 className="header__text">{text}</h1>
       {PAGES.map((p) => (
         <HButton key={p} isDefault={page === p} onClick={onClick(p)}>
-          {p}
+          {p === "login" ? "logout" : p}
         </HButton>
       ))}
     </div>
