@@ -25,17 +25,27 @@ def hello_world():
         print(type(result))
         return json.dumps(str(result)) 
 
-@app.route("/api/v1/login", methods=["POST"])
+@app.route("/api/v1/login", methods=["POST", "OPTIONS"])
 def login():
     ''' Update stored info about person currently logged in
     email: string
     password: string
     '''
-    session['email'] = request.json['email']
 
+    if request.method == "OPTIONS":
+        return Response(
+            headers={"Access-Control-Allow-Origin": "*"},
+            status=200,
+        )
+
+    session['email'] = request.json['email']
     # redirect the user to the home page after "logging in"
-    return "hi"
     # return redirect('/welcome')
+    return Response(     
+            headers={"Access-Control-Allow-Origin": "*"},
+            status=200,
+            mimetype='application/json'
+        )
 
 @app.route("/api/v1/welcome", methods=['GET'])
 def get_welcome():
