@@ -1,45 +1,83 @@
-import { Button, Checkbox, Input, Select, Switch } from "antd";
+import { Checkbox, Select, Switch } from "antd";
 import { Header } from "../components/Header";
-import { usePreferences } from "../hooks/usePreferences";
 import { FormField } from "../components/FormField";
 import { SelectField } from "../components/SelectField";
-import { useEffect, useReducer, useState } from "react";
+import { ReducerAction, useEffect, useReducer, useState } from "react";
 import ApiClient from "../common/apiClient";
-import { PreferencesApiResponse } from "../common/types";
+import {
+  DAY,
+  DAYS,
+  DAYS_ARR,
+  PreferencesApiResponse,
+  PRONOUNS,
+  PronounValue,
+  TIMES_ARR,
+} from "../common/types";
 
-const PRONOUNS = {
-  HE: "he/him/his",
-  SHE: "she/her/hers",
-  THEY: "they/them/theirs",
-} as const;
-type PronounValue = typeof PRONOUNS[keyof typeof PRONOUNS];
-
-const DAYS: Record<string, number> = {
-  Monday: 0,
-  Tuesday: 1,
-  Wednesday: 2,
-  Thursday: 3,
-  Friday: 4,
-};
-
-// assume that people won't be changing timezones
-const TIMES = ["11:00am", "12:00pm", "1:00pm", "2:00pm", "3:00pm"];
+// new reducer type:
+export type DaysReducerState = Record<
+  DAY,
+  {
+    include: boolean;
+    virtual: boolean;
+    inPerson: boolean;
+    t0: boolean;
+    t1: boolean;
+    t2: boolean;
+    t3: boolean;
+    t4: boolean;
+  }
+>;
 
 function daysFreeReducer(
-  state: Record<string, boolean>,
-  payload: string | string[]
+  state: DaysReducerState | null,
+  payload: { day: DAY; field: keyof DaysReducerState[DAY] } | DaysReducerState
 ) {
-  if (typeof payload === "string") {
-    const newState = { ...state };
-    newState[payload] = !state[payload];
+  if (state === null) {
+    return payload as DaysReducerState | null;
+  }
+  const newState = { ...state };
+  if ("day" in payload) {
+    // make inner shallow copy
+    newState[payload.day] = { ...state[payload.day] };
+    newState[payload.day][payload.field] = !state[payload.day][payload.field];
     return newState;
   }
+  return state;
+}
 
-  const newState: Record<string, boolean> = {};
-  for (const day of payload) {
-    newState[day] = true;
+function initializeDaysFreeReducerState(prefs: PreferencesApiResponse) {
+  const state: DaysReducerState = {} as any;
+  for (const currentDay of DAYS_ARR) {
+    const dayIndex = prefs.daysFreeToMeet.indexOf(currentDay);
+    if (dayIndex != -1) {
+      const byDay = prefs.availabilityByDay[dayIndex];
+      state[currentDay] = {
+        include: true,
+        // assume that order of daysFreeToMeet is same day order as availabilityByDay
+        virtual: byDay.canVirtual,
+        inPerson: byDay.canInPerson,
+        t0: byDay.times.includes(TIMES_ARR[0]),
+        t1: byDay.times.includes(TIMES_ARR[1]),
+        t2: byDay.times.includes(TIMES_ARR[2]),
+        t3: byDay.times.includes(TIMES_ARR[3]),
+        t4: byDay.times.includes(TIMES_ARR[4]),
+      };
+    } else {
+      // push something blank
+      state[currentDay] = {
+        include: false,
+        virtual: false,
+        inPerson: false,
+        t0: false,
+        t1: false,
+        t2: false,
+        t3: false,
+        t4: false,
+      };
+    }
   }
-  return newState;
+  return state;
 }
 
 const VIRTUAL_STUFF = [
@@ -53,10 +91,7 @@ export default function Preferences() {
   const [email, setEmail] = useState("");
   const [pronouns, setPronouns] = useState<PronounValue>();
   const [doesWantMatching, setDoesWantMatching] = useState(false);
-  const [daysFreeToMeet, daysFreeDispatch] = useReducer(
-    daysFreeReducer,
-    {} as any
-  );
+  const [daysFreeToMeet, daysFreeDispatch] = useReducer(daysFreeReducer, null);
 
   useEffect(() => {
     ApiClient.getPreferences().then((data) => {
@@ -66,7 +101,7 @@ export default function Preferences() {
       setEmail(prefs.email);
       setPronouns(prefs.preferredPronouns as any);
       setDoesWantMatching(prefs.doesWantMatching);
-      daysFreeDispatch(prefs.daysFreeToMeet);
+      daysFreeDispatch(initializeDaysFreeReducerState(prefs));
     });
   }, []);
   return (
@@ -76,7 +111,7 @@ export default function Preferences() {
       <FormField name="Email:" value={email} onChange={setEmail} />
       <FormField name="Preferred pronouns:" value={pronouns}>
         <Select className="preferences__input" defaultValue={pronouns}>
-          {Object.entries(PRONOUNS).map(([key, value]) => (
+          {Object.entries(PRONOUNS).map(([_key, value]) => (
             <Select.Option key={value} value={value}>
               {value}
             </Select.Option>
@@ -92,32 +127,40 @@ export default function Preferences() {
       </FormField>
       <SelectField
         name="What days can you meet?"
-        dispatch={daysFreeDispatch}
-        options={Object.keys(DAYS).map((d) => ({
+        dispatch={(d) => daysFreeDispatch({ day: d as DAY, field: "include" })}
+        options={DAYS_ARR.map((d) => ({
           name: d,
-          toggled: Boolean(daysFreeToMeet[d]),
+          toggled: Boolean(daysFreeToMeet?.[d].include),
         }))}
       />
-      {Object.entries(daysFreeToMeet)
-        .sort((a, b) => DAYS[a[0]] - DAYS[b[0]])
-        .map(
-          ([key, value]) =>
-            value && (
-              <div className="preferences__selectdays">
-                <SelectField
-                  name={`What times on ${key}?`}
-                  options={TIMES.map((n) => ({ name: n, toggled: false }))}
-                  dispatch={(s: string) => {}}
-                  className="preferences__selectdays__select"
-                />
-                <div className="preferences__selectdays__mode">
-                  <Checkbox>Virtual</Checkbox>
-                  <br />
-                  <Checkbox>In-person</Checkbox>
+      {daysFreeToMeet &&
+        Object.entries(daysFreeToMeet)
+          .filter(([_, value]) => value.include)
+          .sort((a, b) => DAYS[a[0] as DAY] - DAYS[b[0] as DAY])
+          .map(
+            ([day, value]) =>
+              value && (
+                <div className="preferences__selectdays" key={day}>
+                  <SelectField
+                    name={`What times on ${day}?`}
+                    options={TIMES_ARR.map((n, i) => ({
+                      name: n,
+                      toggled: (daysFreeToMeet as any)[day]["t" + i],
+                    }))}
+                    dispatch={(time) => {
+                      const index = TIMES_ARR.indexOf(time);
+                      daysFreeDispatch({ day, field: "t" + index } as any);
+                    }}
+                    className="preferences__selectdays__select"
+                  />
+                  <div className="preferences__selectdays__mode">
+                    <Checkbox>Virtual</Checkbox>
+                    <br />
+                    <Checkbox>In-person</Checkbox>
+                  </div>
                 </div>
-              </div>
-            )
-        )}
+              )
+          )}
     </>
   );
 }

@@ -37,8 +37,12 @@
     }
 
     &__mode {
-      margin-left: auto;
+      margin-left: 20px;
       display: inline;
     }
+  }
+
+  &__none {
+    display: none;
   }
 }

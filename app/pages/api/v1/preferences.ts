@@ -1,6 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PreferencesApiResponse, WelcomeApiResponse } from "../../../common/types";
+import {
+  PreferencesApiResponse,
+  TIMES_ARR,
+  WelcomeApiResponse,
+} from "../../../common/types";
 
 const sampleResponse: PreferencesApiResponse = {
   name: "Alex",
@@ -10,19 +14,12 @@ const sampleResponse: PreferencesApiResponse = {
   daysFreeToMeet: ["Monday", "Wednesday"],
   availabilityByDay: [
     {
-      times: [
-        new Date("Mon Aug 02 2021 12:00:00 GMT-0400 (Eastern Daylight Time)"),
-        new Date("Mon Aug 02 2021 13:00:00 GMT-0400 (Eastern Daylight Time)"),
-        new Date("Mon Aug 02 2021 14:00:00 GMT-0400 (Eastern Daylight Time)"),
-      ],
+      times: [TIMES_ARR[1], TIMES_ARR[2], TIMES_ARR[3]],
       canVirtual: true,
       canInPerson: true,
     },
     {
-      times: [
-        new Date("Wed Aug 04 2021 11:00:00 GMT-0400 (Eastern Daylight Time)"),
-        new Date("Wed Aug 04 2021 14:00:00 GMT-0400 (Eastern Daylight Time)"),
-      ],
+      times: [TIMES_ARR[0], TIMES_ARR[3]],
       canVirtual: true,
       canInPerson: false,
     },
