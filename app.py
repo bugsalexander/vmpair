@@ -27,7 +27,7 @@ def login():
     email: string
     password: string
     '''
-    session['email'] = request.form['email']
+    session['email'] = request.json['email']
 
     # redirect the user to the home page after "logging in"
     return "hi"
@@ -126,26 +126,73 @@ def get_preferences():
             mimetype='application/json'
         )
 
-@app.route("/api/v1/preferences", methods=['POST', 'PUT'])
-def set_preferences(preferences):
+@app.route("/api/v1/preferences", methods=['POST'])
+def set_preferences():
     ''' Update existing preferences
     name: string
     preferredPronouns: string
     email: string
     doesWantMatching: boolean
-    daysFreeToMeet: string[]
     availabilityByDay: weekDayAvail[]
-    Fields in weekDayAvail object
-    times: string[]
-    Monday: [“12pm”, “1pm”] or [10:15, 10:30, 12:00, 1:00]
-    canVirtual: boolean
-    canInPerson: boolean
+        Fields in weekDayAvail object
+            times: string[] e.g. Monday: [“12pm”, “1pm”]
+            canVirtual: boolean
+            canInPerson: boolean
     maxMeetingsPerWeek: number
     '''
-    email = config.EMAIL
     # enter name, preferredPronouns, doesWantMatching into Users table
-    # enter availabilityByDay, maxMeetingsPerWeek into Availability table
-    return
+    # enter availabilityByDay fields, maxMeetingsPerWeek into Availability table
+
+    with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
+        # see if the user already has preferences set up
+        mycursor = mydb.cursor()
+        mycursor.execute(f'''SELECT full_name
+        FROM users
+        INNER JOIN days_of_week_availability ON users.email = days_of_week_availability.email 
+        WHERE users.email = '{session['email']}';''')
+
+        preferences_record = mycursor.fetchall()
+        if len(preferences_record) > 1: 
+            return Response(json.dumps({'msg': 'you cannot have more than one user per email'}), status=404, mimetyple='application/json')
+        if len(preferences_record) == 1:
+            # update the user record
+            mycursor = mydb.cursor()
+            mycursor.execute(f'''UPDATE users
+            SET users.full_name = '{request.json['name']}',
+                users.preferred_pronouns = '{request.json['preferredPronouns']}',
+                users.does_want_matching = {request.json['doesWantMatching']}
+            WHERE users.email = '{session['email']}';''')
+
+            # update the days_of_week_availability record
+            mycursor = mydb.cursor()
+            mycursor.execute(f'''UPDATE days_of_week_availability
+            SET days_of_week_availability.max_weekly_meetings = '{request.json['maxMeetingsPerWeek']}',
+
+                days_of_week_availability.monday_times = '{str(request.json['availabilityByDay'][0]['times'])}',
+                days_of_week_availability.monday_can_virtual = {request.json['availabilityByDay'][0]['canVirtual']},
+                days_of_week_availability.monday_can_in_person = {request.json['availabilityByDay'][0]['canInPerson']},
+
+                days_of_week_availability.tuesday_times = '{str(request.json['availabilityByDay'][1]['times'])}',
+                days_of_week_availability.tuesday_can_virtual = {request.json['availabilityByDay'][1]['canVirtual']},
+                days_of_week_availability.tuesday_can_in_person = {request.json['availabilityByDay'][1]['canInPerson']},
+
+                days_of_week_availability.wednesday_times = '{str(request.json['availabilityByDay'][2]['times'])}',
+                days_of_week_availability.wednesday_can_virtual = {request.json['availabilityByDay'][2]['canVirtual']},
+                days_of_week_availability.wednesday_can_in_person = {request.json['availabilityByDay'][2]['canInPerson']},
+
+                days_of_week_availability.thursday_times = '{str(request.json['availabilityByDay'][3]['times'])}',
+                days_of_week_availability.thursday_can_virtual = {request.json['availabilityByDay'][3]['canVirtual']},
+                days_of_week_availability.thursday_can_in_person = {request.json['availabilityByDay'][3]['canInPerson']},
+
+                days_of_week_availability.friday_times = '{str(request.json['availabilityByDay'][4]['times'])}',
+                days_of_week_availability.friday_can_virtual = {request.json['availabilityByDay'][4]['canVirtual']},
+                days_of_week_availability.friday_can_in_person = {request.json['availabilityByDay'][4]['canInPerson']}
+            WHERE days_of_week_availability.email = '{session['email']}';''')
+        else:
+            # insert the record
+            # TODO
+            pass
+    return Response(json.dumps({'msg': 'successfully updated preferences'}), status=200, mimetype='application/json') 
 
 @app.route("/api/v1/stats", methods=['GET'])
 def get_stats():
