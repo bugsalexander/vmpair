@@ -21,4 +21,24 @@
   &__select {
     margin-left: 10px;
   }
+
+  &__times {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__selectdays {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &__select {
+      display: inline;
+    }
+
+    &__mode {
+      margin-left: auto;
+      display: inline;
+    }
+  }
 }

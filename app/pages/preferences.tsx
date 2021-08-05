@@ -1,4 +1,4 @@
-import { Input, Select, Switch } from "antd";
+import { Button, Checkbox, Input, Select, Switch } from "antd";
 import { Header } from "../components/Header";
 import { usePreferences } from "../hooks/usePreferences";
 import { FormField } from "../components/FormField";
@@ -14,7 +14,16 @@ const PRONOUNS = {
 } as const;
 type PronounValue = typeof PRONOUNS[keyof typeof PRONOUNS];
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const DAYS: Record<string, number> = {
+  Monday: 0,
+  Tuesday: 1,
+  Wednesday: 2,
+  Thursday: 3,
+  Friday: 4,
+};
+
+// assume that people won't be changing timezones
+const TIMES = ["11:00am", "12:00pm", "1:00pm", "2:00pm", "3:00pm"];
 
 function daysFreeReducer(
   state: Record<string, boolean>,
@@ -32,6 +41,11 @@ function daysFreeReducer(
   }
   return newState;
 }
+
+const VIRTUAL_STUFF = [
+  { label: "Virtual", value: true },
+  { label: "In-person", value: false },
+];
 
 export default function Preferences() {
   // form state
@@ -79,11 +93,31 @@ export default function Preferences() {
       <SelectField
         name="What days can you meet?"
         dispatch={daysFreeDispatch}
-        options={DAYS.map((d) => ({
+        options={Object.keys(DAYS).map((d) => ({
           name: d,
           toggled: Boolean(daysFreeToMeet[d]),
         }))}
       />
+      {Object.entries(daysFreeToMeet)
+        .sort((a, b) => DAYS[a[0]] - DAYS[b[0]])
+        .map(
+          ([key, value]) =>
+            value && (
+              <div className="preferences__selectdays">
+                <SelectField
+                  name={`What times on ${key}?`}
+                  options={TIMES.map((n) => ({ name: n, toggled: false }))}
+                  dispatch={(s: string) => {}}
+                  className="preferences__selectdays__select"
+                />
+                <div className="preferences__selectdays__mode">
+                  <Checkbox>Virtual</Checkbox>
+                  <br />
+                  <Checkbox>In-person</Checkbox>
+                </div>
+              </div>
+            )
+        )}
     </>
   );
 }
