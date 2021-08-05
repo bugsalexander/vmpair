@@ -18,7 +18,6 @@ export type PreferencesApiRequest = {
   preferredPronouns: string;
   email: string;
   doesWantMatching: boolean;
-  daysFreeToMeet: string[];
   availabilityByDay: Array<{
     times: string[];
     canVirtual: boolean;

@@ -144,6 +144,7 @@ def get_preferences():
             print('preferences_record is', preferences_record)
             fullName, preferredPronouns, email, role, team, dateStarted, doesWantMatching, sameEmail, maxMeetingsPerWeek, mondayTimesStr, mondayCanVirtual, mondayCanInPerson, tuesdayTimesStr, tuesdayCanVirtual, tuesdayCanInPerson, wednesdayTimesStr, wednesdayCanVirtual, wednesdayCanInPerson, thursdayTimesStr, thursdayCanVirtual, thursdayCanInPerson, fridayTimesStr, fridayCanVirtual, fridayCanInPerson = preferences_record
 
+        print(mondayTimesStr)
         result = {
             "name": fullName,
             "preferredPronouns": preferredPronouns,

@@ -56,35 +56,22 @@ function daysFreeReducer(
 
 function initializeDaysFreeReducerState(prefs: PreferencesApiResponse) {
   const mapping: DaysReducerState["mapping"] = {} as any;
-  for (const currentDay of DAYS_ARR) {
-    const dayIndex = prefs.daysFreeToMeet.indexOf(currentDay);
-    if (dayIndex != -1) {
-      const byDay = prefs.availabilityByDay[dayIndex];
-      mapping[currentDay] = {
-        include: true,
-        // assume that order of daysFreeToMeet is same day order as availabilityByDay
-        virtual: byDay.canVirtual,
-        inPerson: byDay.canInPerson,
-        t0: byDay.times.includes(TIMES_ARR[0]),
-        t1: byDay.times.includes(TIMES_ARR[1]),
-        t2: byDay.times.includes(TIMES_ARR[2]),
-        t3: byDay.times.includes(TIMES_ARR[3]),
-        t4: byDay.times.includes(TIMES_ARR[4]),
-      };
-    } else {
-      // push something blank
-      mapping[currentDay] = {
-        include: false,
-        virtual: false,
-        inPerson: false,
-        t0: false,
-        t1: false,
-        t2: false,
-        t3: false,
-        t4: false,
-      };
-    }
+  for (const [index, dayPref] of prefs.availabilityByDay.entries()) {
+    const day = DAYS_ARR[index];
+    const empty = dayPref.times.length === 0;
+    mapping[day] = {
+      include: !empty,
+      // assume that order of daysFreeToMeet is same day order as availabilityByDay
+      virtual: !empty && dayPref.canVirtual,
+      inPerson: !empty && dayPref.canInPerson,
+      t0: !empty && dayPref.times.includes(TIMES_ARR[0]),
+      t1: !empty && dayPref.times.includes(TIMES_ARR[1]),
+      t2: !empty && dayPref.times.includes(TIMES_ARR[2]),
+      t3: !empty && dayPref.times.includes(TIMES_ARR[3]),
+      t4: !empty && dayPref.times.includes(TIMES_ARR[4]),
+    };
   }
+  console.log(mapping);
   return { mapping, diff: false };
 }
 
@@ -150,51 +137,72 @@ export default function Preferences() {
         Object.entries(daysFreeToMeet.mapping)
           .filter(([_, value]) => value.include)
           .sort((a, b) => DAYS[a[0] as DAY] - DAYS[b[0] as DAY])
-          .map(
-            ([day, value]) =>
-              value && (
-                <div className="preferences__selectdays" key={day}>
-                  <SelectField
-                    name={`What times on ${day}?`}
-                    options={TIMES_ARR.map((n, i) => ({
-                      name: n,
-                      toggled: (daysFreeToMeet?.mapping as any)[day]["t" + i],
-                    }))}
-                    dispatch={(time) => {
-                      const index = TIMES_ARR.indexOf(time);
-                      daysFreeDispatch({ day, field: "t" + index } as any);
-                    }}
-                    className="preferences__selectdays__select"
-                  />
-                  <div className="preferences__selectdays__mode">
-                    <Checkbox
-                      checked={(daysFreeToMeet.mapping as any)[day].virtual}
-                      onClick={() =>
-                        daysFreeDispatch({ day, field: "virtual" } as any)
-                      }
-                    >
-                      Virtual
-                    </Checkbox>
-                    <br />
-                    <Checkbox
-                      checked={(daysFreeToMeet.mapping as any)[day].inPerson}
-                      onClick={() =>
-                        daysFreeDispatch({ day, field: "inPerson" } as any)
-                      }
-                    >
-                      In-person
-                    </Checkbox>
-                  </div>
+          .map(([d, value]) => {
+            const day = d as DAY;
+            const mapping = daysFreeToMeet.mapping;
+            const t = (i: number) => ("t" + i) as MappingFields;
+
+            return (
+              <div className="preferences__selectdays" key={day}>
+                <SelectField
+                  name={`What times on ${day}?`}
+                  options={TIMES_ARR.map((n, i) => ({
+                    name: n,
+                    toggled: mapping[day][t(i)],
+                  }))}
+                  dispatch={(time) => {
+                    const index = TIMES_ARR.indexOf(time);
+                    daysFreeDispatch({ day, field: "t" + index } as any);
+                  }}
+                  className="preferences__selectdays__select"
+                />
+                <div className="preferences__selectdays__mode">
+                  <Checkbox
+                    checked={mapping[day].virtual}
+                    onClick={() => daysFreeDispatch({ day, field: "virtual" })}
+                  >
+                    Virtual
+                  </Checkbox>
+                  <br />
+                  <Checkbox
+                    checked={mapping[day].inPerson}
+                    onClick={() => daysFreeDispatch({ day, field: "inPerson" })}
+                  >
+                    In-person
+                  </Checkbox>
                 </div>
-              )
-          )}
+              </div>
+            );
+          })}
       <div className="preferences__buttonflex">
         <Button
           className="preferences__buttonflex__button"
           type="primary"
           disabled={!daysFreeToMeet?.diff}
           onClick={() => {
-            console.log(daysFreeToMeet);
+            daysFreeToMeet &&
+              ApiClient.postPreferences({
+                name,
+                preferredPronouns: pronouns!,
+                email,
+                doesWantMatching,
+                availabilityByDay: DAYS_ARR.map(
+                  (day) => daysFreeToMeet.mapping[day]
+                ).map((prefs) => {
+                  const { inPerson, virtual, include } = prefs;
+                  return {
+                    canInPerson: include ? inPerson : false,
+                    canVirtual: include ? virtual : false,
+                    times: !include
+                      ? []
+                      : TIMES_ARR.flatMap((time, index) =>
+                          (prefs as any)["t" + index] ? [time] : []
+                        ),
+                  };
+                }),
+                maxMeetingsPerWeek: 2,
+              });
+
             daysFreeDispatch("save");
           }}
         >

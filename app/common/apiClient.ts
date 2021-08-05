@@ -15,12 +15,22 @@ export const ROUTES = {
 };
 
 const baseURL =
-  process.env.NODE_ENV === "production" ? undefined : "http://localhost:5000";
+  process.env.NODE_ENV === "production" ? undefined : "http://localhost:3000";
 
 const ApiClient = {
   getWelcome: () => axios.get<WelcomeApiResponse>(ROUTES.WELCOME, { baseURL }),
-  getPreferences: () =>
-    axios.get<PreferencesApiResponse>(ROUTES.PREFERENCES, { baseURL }),
+  getPreferences: async () => {
+    const response = await axios.get<PreferencesApiResponse>(
+      ROUTES.PREFERENCES,
+      { baseURL }
+    );
+    for (const d of response.data.availabilityByDay) {
+      if (typeof d.times === "string") {
+        d.times = (d.times as string).split(",").map((s) => s.trim());
+      }
+    }
+    return response;
+  },
   getStats: () => axios.get<StatsApiResponse>(ROUTES.STATS, { baseURL }),
   postWelcome: (payload: WelcomeApiRequest) =>
     axios.post(ROUTES.WELCOME, payload, { baseURL }),
