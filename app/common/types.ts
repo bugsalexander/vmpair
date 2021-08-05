@@ -31,10 +31,7 @@ export type PreferencesApiResponse = PreferencesApiRequest;
 export type StatsApiResponse = {
   totalPeopleMet: number;
   totalMeetings: number;
-  peopleMet: Array<{
-    name: string;
-    date: Date;
-  }>;
+  peopleMet: Record<string, string>;
 };
 
 export const PRONOUNS = {
