@@ -42,7 +42,12 @@
     }
   }
 
-  &__none {
-    display: none;
+  &__buttonflex {
+    display: flex;
+    margin-top: 1.5em;
+
+    &__button {
+      margin-left: auto;
+    }
   }
 }
