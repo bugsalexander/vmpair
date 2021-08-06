@@ -42,8 +42,8 @@ CREATE TABLE `days_of_week_availability` (
 
 INSERT INTO `days_of_week_availability` VALUES ('bsusan@vmware.com', 3, '["12:00", "1:00"]', TRUE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE);
 INSERT INTO `days_of_week_availability` VALUES ('bzach@vmware.com', 2, '["1:00", "2:00"]', TRUE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE);
-INSERT INTO `days_of_week_availability` VALUES ('sjohn@vmware.com', 1, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '["1:00, "3:00"]', TRUE, FALSE);
-INSERT INTO `days_of_week_availability` VALUES ('jmary@vmware.com', 4, '["1:00"]', FALSE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '["1:00, "2:00", "3:00"]', TRUE, TRUE);
+INSERT INTO `days_of_week_availability` VALUES ('sjohn@vmware.com', 1, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '["1:00", "3:00"]', TRUE, FALSE);
+INSERT INTO `days_of_week_availability` VALUES ('jmary@vmware.com', 4, '["1:00"]', FALSE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '["1:00", "2:00", "3:00"]', TRUE, TRUE);
 
 
 CREATE TABLE `meetings` (
