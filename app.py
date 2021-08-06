@@ -32,11 +32,20 @@ def login():
     password: string
     '''
 
+    print(request.json['email'])
     session['email'] = request.json['email']
-    return Response(     
-            status=200,
-            mimetype='application/json'
-        )
+    return Response(200)
+
+@app.route("/api/v1/logout", methods=["GET", "OPTIONS"])
+def logout():
+    ''' Log the user out
+    '''
+    try:
+        session.pop('email')
+    except:
+        pass
+    
+    return Response(200)
 
 @app.route("/api/v1/welcome", methods=['GET'])
 def get_welcome():
