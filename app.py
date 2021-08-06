@@ -32,17 +32,8 @@ def login():
     password: string
     '''
 
-    if request.method == "OPTIONS":
-        return Response(
-            headers={"Access-Control-Allow-Origin": "*"},
-            status=200,
-        )
-
     session['email'] = request.json['email']
-    # redirect the user to the home page after "logging in"
-    # return redirect('/welcome')
     return Response(     
-            headers={"Access-Control-Allow-Origin": "*"},
             status=200,
             mimetype='application/json'
         )
@@ -61,57 +52,62 @@ def get_welcome():
         mycursor = mydb.cursor()
         # Query name from the Users table using email
         mycursor.execute(f"select full_name from users where email = '{session['email']}';")
-        result = mycursor.fetchall()
-        print("the result of the first query is", result)
-        name = result[0][0]
-        print(session['email'])
+        name = mycursor.fetchone()
+
+        result = {
+                "name": name,
+                "nextPairing": 7 - datetime.now().weekday()
+            }
 
         # Query next meeting info from Meetings table using email
-        mycursor.execute(f"select user_2_email, meeting_date, user_2_attending from meetings where user_1_email = '{session['email']}';")
-        result = mycursor.fetchall()
-        mycursor.execute(f"select user_1_email, meeting_date, user_1_attending from meetings where user_2_email = '{session['email']}';")
-        result.extend(mycursor.fetchall())
-        print("the result of the second query is", result)
-        if result != []:
-            (partnerEmail, nextMeetingTime, partnerStatus) = result[0]
-            print(nextMeetingTime.strftime("%m/%d/%Y"))
+        mycursor = mydb.cursor()
+        mycursor.execute(f'''SELECT user_2_email AS partner_email, meeting_date, user_2_attending AS partner_status
+        FROM meetings
+        WHERE user_1_email = '{session['email']} AND meeting_date > CURDATE()' 
+        
+        UNION 
+        
+        SELECT user_1_email AS partner_email, meeting_date, user_1_attending AS partner_status
+        FROM meetings
+        WHERE user_2_email = '{session['email']}' AND meeting_date > CURDATE();''')
+
+        next_meeting_info = mycursor.fetchone()
+        if next_meeting_info != None:
+            partnerEmail, nextMeetingTime, partnerStatus = next_meeting_info
         
             # Query partner's name from the Users table using their email
-            mycursor.execute(f"select full_name from users where email = '{partnerEmail}';")
-            result = mycursor.fetchall()
-            print("the result of the third query is", result)
-            partnerName = result[0][0]
+            mycursor.execute(f"SELECT full_name FROM users WHERE email = '{partnerEmail}';")
+            partnerName = mycursor.fetchone()
+            print("the result of the third query is", partnerName)
         
-            result = {
-                "name": name,
-                "nextMeeting": {
+            result["nextMeeting"] = {
                     "partnerName": partnerName,
                     "time": nextMeetingTime.strftime("%m/%d/%Y"),
                     "partnerStatus": partnerStatus,
-                },
-                "nextPairing": 7 - datetime.now().weekday()
-            }
-            return Response(
-                json.dumps(result),
-                headers={"Access-Control-Allow-Origin": "*"},
-                status=200,
-                mimetype='application/json'
-            )
+                    }
+
+        return Response(
+            json.dumps(result),
+            status=200,
+            mimetype='application/json'
+        )
 
 @app.route("/api/v1/welcome", methods=['POST'])
 def set_welcome():
-    willBeAttending = request.json.get('willBeAttending')
+    willBeAttending = request.json['willBeAttending']
+    print("field type is", type(willBeAttending))
     # enter willBeAttending status from welcome page into Meetings table
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
         mycursor = mydb.cursor()
-        mycursor.execute(f"update meetings set user_1_attending = {willBeAttending} where user_1_email = '{session['email']}' \
-            and meeting_date > current_date;")
-        mycursor.execute(f"update meetings set user_2_attending = {willBeAttending} where user_2_email = '{session['email']}' \
-            and meeting_date > current_date;")
+        mycursor.execute(f'''UPDATE meetings 
+        SET user_1_attending = {willBeAttending} 
+        WHERE user_1_email = '{session['email']}' AND meeting_date > CURDATE();''')
+        mycursor.execute(f'''UPDATE meetings 
+        SET user_2_attending = {willBeAttending} 
+        WHERE user_2_email = '{session['email']}' AND meeting_date > CURDATE();''')
         mydb.commit()
         return Response(
             json.dumps({"willBeAttending":willBeAttending}),
-            headers={"Access-Control-Allow-Origin": "*"},
             status=200,
             mimetype='application/json'
         )
@@ -186,7 +182,6 @@ def get_preferences():
         }
         return Response(
             json.dumps(result),
-            headers={"Access-Control-Allow-Origin": "*"},
             status=200,
             mimetype='application/json'
         )
@@ -264,7 +259,6 @@ def set_preferences():
             pass
     return Response(
         json.dumps({'msg': 'successfully updated preferences'}), 
-        headers={"Access-Control-Allow-Origin": "*"},
         status=200, 
         mimetype='application/json'
     ) 
@@ -303,7 +297,6 @@ def get_stats():
         }
         return Response(
             json.dumps(result),
-            headers={"Access-Control-Allow-Origin": "*"},
             status=200,
             mimetype='application/json'
         )
