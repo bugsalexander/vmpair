@@ -14,7 +14,6 @@ export default function Home() {
   useEffect(() => {
     ApiClient.getWelcome().then((req) => {
       setData(req.data);
-      console.log(req.data);
       setCanAttend(!!req.data.willBeAttending);
     });
   }, []);

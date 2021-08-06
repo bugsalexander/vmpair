@@ -71,7 +71,6 @@ function initializeDaysFreeReducerState(prefs: PreferencesApiResponse) {
       t4: !empty && dayPref.times.includes(TIMES_ARR[4]),
     };
   }
-  console.log(mapping);
   return { mapping, diff: false };
 }
 
@@ -84,7 +83,7 @@ export default function Preferences() {
   // form state
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [pronouns, setPronouns] = useState<PronounValue>();
+  const [pronouns, setPronouns] = useState("");
   const [doesWantMatching, setDoesWantMatching] = useState(false);
   const [daysFreeToMeet, daysFreeDispatch] = useReducer(daysFreeReducer, null);
   const [maxMeetingsPerWeek, setMaxMeetingsPerWeek] = useState(0);
@@ -100,7 +99,7 @@ export default function Preferences() {
       const prefs = data.data;
       setName(prefs.name);
       setEmail(prefs.email);
-      setPronouns(prefs.preferredPronouns as any);
+      setPronouns(prefs.preferredPronouns);
       setDoesWantMatching(prefs.doesWantMatching);
       setMaxMeetingsPerWeek(prefs.maxMeetingsPerWeek);
       daysFreeDispatch(initializeDaysFreeReducerState(prefs));
@@ -116,20 +115,11 @@ export default function Preferences() {
         onChange={withSetDiff(setEmail)}
         disabled
       />
-      <FormField name="Preferred pronouns:" value={pronouns}>
-        <Select
-          className="preferences__input"
-          defaultValue={pronouns}
-          value={pronouns}
-          onChange={withSetDiff(setPronouns)}
-        >
-          {Object.entries(PRONOUNS).map(([_key, value]) => (
-            <Select.Option key={value} value={value}>
-              {value}
-            </Select.Option>
-          ))}
-        </Select>
-      </FormField>
+      <FormField
+        name="Preferred pronouns:"
+        value={pronouns}
+        onChange={withSetDiff(setPronouns)}
+      />
       <FormField name="Do you want to participate in matching?" value="">
         <Switch
           className="preferences__switch"
@@ -186,7 +176,11 @@ export default function Preferences() {
               </div>
             );
           })}
-      <FormField name="How many days a week would you like to meet, if possible?" value={maxMeetingsPerWeek} onChange={withSetDiff(setMaxMeetingsPerWeek)} />
+      <FormField
+        name="How many days a week would you like to meet, if possible?"
+        value={maxMeetingsPerWeek}
+        onChange={withSetDiff(setMaxMeetingsPerWeek)}
+      />
       <div className="preferences__buttonflex">
         <Button
           className="preferences__buttonflex__button"
