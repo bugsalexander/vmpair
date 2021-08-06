@@ -63,7 +63,7 @@ def get_welcome():
         mycursor = mydb.cursor()
         mycursor.execute(f'''SELECT user_2_email AS partner_email, meeting_date, user_2_attending AS partner_status
         FROM meetings
-        WHERE user_1_email = '{session['email']} AND meeting_date > CURDATE()' 
+        WHERE user_1_email = '{session['email']}' AND meeting_date > CURDATE() 
         
         UNION 
         

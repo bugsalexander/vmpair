@@ -15,6 +15,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` VALUES ('Susan Bailey', 'She/her/hers', 'bsusan@vmware.com', 'Marketer', 'Sales', '2014-07-22', TRUE);
 INSERT INTO `users` VALUES ('Zach Butler', 'They/them/theirs', 'bzach@vmware.com', 'Software Engineer', 'Engineering', '2019-08-11', TRUE);
+INSERT INTO `users` VALUES ('John Smith', 'He/him/his', 'sjohn@vmware.com', 'Software Engineer', 'Engineering', '2021-01-14', TRUE);
+INSERT INTO `users` VALUES ('Mary Jane', 'She/her/hers', 'jmary@vmware.com', 'Finance', 'CFO', '2014-07-22', TRUE);
 
 
 CREATE TABLE `days_of_week_availability` (
@@ -40,6 +42,8 @@ CREATE TABLE `days_of_week_availability` (
 
 INSERT INTO `days_of_week_availability` VALUES ('bsusan@vmware.com', 3, '["12:00", "1:00"]', TRUE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE);
 INSERT INTO `days_of_week_availability` VALUES ('bzach@vmware.com', 2, '["1:00", "2:00"]', TRUE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE);
+INSERT INTO `days_of_week_availability` VALUES ('sjohn@vmware.com', 1, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '["1:00, "3:00"]', TRUE, FALSE);
+INSERT INTO `days_of_week_availability` VALUES ('jmary@vmware.com', 4, '["1:00"]', FALSE, TRUE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '[]', FALSE, FALSE, '["1:00, "2:00", "3:00"]', TRUE, TRUE);
 
 
 CREATE TABLE `meetings` (
@@ -53,3 +57,4 @@ CREATE TABLE `meetings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `meetings` VALUES (null, 'bsusan@vmware.com', 'bzach@vmware.com', '2021-07-05', TRUE, TRUE);
+INSERT INTO `meetings` VALUES (null, 'sjohn@vmware.com', 'jmary@vmware.com', '2021-08-13', TRUE, TRUE);
