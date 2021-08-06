@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <>
-      <Header page="home" text={`Hey ${data?.name}! Welcome to VMpair`} />
+      <Header page="home" text={`${data?.name}'s Dashboard`} />
       <MeetingBox meeting={data?.nextMeeting} nextPairing={data?.nextPairing}>
         <Switch
           checked={canAttend}

@@ -87,6 +87,7 @@ export default function Preferences() {
   const [pronouns, setPronouns] = useState<PronounValue>();
   const [doesWantMatching, setDoesWantMatching] = useState(false);
   const [daysFreeToMeet, daysFreeDispatch] = useReducer(daysFreeReducer, null);
+  const [maxMeetingsPerWeek, setMaxMeetingsPerWeek] = useState(0);
   const [diff, setDiff] = useState(false);
   const withSetDiff = (f: any) => (v: any) => {
     f(v);
@@ -101,6 +102,7 @@ export default function Preferences() {
       setEmail(prefs.email);
       setPronouns(prefs.preferredPronouns as any);
       setDoesWantMatching(prefs.doesWantMatching);
+      setMaxMeetingsPerWeek(prefs.maxMeetingsPerWeek);
       daysFreeDispatch(initializeDaysFreeReducerState(prefs));
     });
   }, []);
@@ -184,6 +186,7 @@ export default function Preferences() {
               </div>
             );
           })}
+      <FormField name="How many days a week would you like to meet, if possible?" value={maxMeetingsPerWeek} onChange={withSetDiff(setMaxMeetingsPerWeek)} />
       <div className="preferences__buttonflex">
         <Button
           className="preferences__buttonflex__button"
@@ -210,7 +213,7 @@ export default function Preferences() {
                         ),
                   };
                 }),
-                maxMeetingsPerWeek: 2,
+                maxMeetingsPerWeek: maxMeetingsPerWeek,
               });
 
             daysFreeDispatch("save");

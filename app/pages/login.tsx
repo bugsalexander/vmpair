@@ -31,7 +31,7 @@ export default function Login() {
             Meet new coworkers over lunch!
           </div>
           <LoginFields onChange={setEmail} />
-          <LoginButton onClick={() => {
+          <LoginButton login onClick={() => {
             ApiClient.login(email);
             router.push("/");
           }}>Login</LoginButton>
@@ -44,9 +44,7 @@ export default function Login() {
                   width: 350
               }}
           />
-          <Link href="/login" passHref>
-              <div className="login__create_account">Create new account</div>
-          </Link>
+          <LoginButton>Create new account</LoginButton>
         </div>
       </div>
     </>

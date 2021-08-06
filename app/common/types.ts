@@ -64,3 +64,13 @@ export type TIME = keyof typeof TIMES;
 export const TIMES_ARR: string[] = Object.entries(TIMES)
   .sort((a, b) => a[1] - b[1])
   .map((a) => a[0]) as TIME[];
+
+export const MAX_MEETINGS = {
+  0: 0,
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5
+} as const;
+export type MaxMeetings = typeof MAX_MEETINGS[keyof typeof MAX_MEETINGS];
