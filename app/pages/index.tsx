@@ -9,7 +9,7 @@ import { WelcomeApiResponse } from "../common/types";
 
 export default function Home() {
   const [data, setData] = useState<WelcomeApiResponse | null>(null);
-  const [canAttend, setCanAttend] = useState(false);
+  const [canAttend, setCanAttend] = useState(true);
 
   useEffect(() => {
     ApiClient.getWelcome().then((data) => {
@@ -30,18 +30,18 @@ export default function Home() {
           }}
         />
       </MeetingBox>
-      <p>
+      <div className="index__bottomlinks">
         To change your scheduled meeting frequency,{" "}
         <Link href="/preferences" passHref>
           <div className="index__link">update your preferences</div>
         </Link>
         .
-      </p>
-      <p>
+      </div>
+      <div className="index__bottomlinks">
         <Link href="/statistics" passHref>
           <div className="index__link">View my pairing stats</div>
         </Link>
-      </p>
+      </div>
     </>
   );
 }

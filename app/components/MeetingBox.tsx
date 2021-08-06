@@ -47,10 +47,7 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
             <div className="meetingbox__toggle">{children}</div>
           </div>
           <p className="meetingbox__nobottommargin">
-            {meeting.partnerName} has{" "}
-            {meeting.partnerStatus === 1
-              ? "accepted the meeting!"
-              : "not yet indicated whether they will be able to make the meeting"}
+            {meeting.partnerName} is planning on attending!
           </p>
         </>
       ) : (

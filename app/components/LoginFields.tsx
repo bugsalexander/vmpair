@@ -19,7 +19,7 @@ export const LoginFields: React.FC<LoginFieldsProps> = ({
           <Input onChange={onChange ? (e) => onChange(e.target.value) : undefined}/>
         </div>
         <div className="login__input">
-          <Input/>
+          <Input type={"password"}/>
         </div>
       </div>
     </div>

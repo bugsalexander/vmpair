@@ -1,6 +1,6 @@
 import { Header } from "../components/Header";
 import { NumberStat } from "../components/NumberStat";
-import { Meetings } from "../components/Meetings";
+import { Fragment} from "react";
 import { useStats } from "../hooks/useStats";
 
 export default function Home() {
@@ -14,7 +14,7 @@ export default function Home() {
         {data &&
           Object.entries(data.peopleMet).map(([name, date]) => {
             return (
-              <>
+              <Fragment key={date}>
                 <div className="statistics__inline">
                   <div key={name} className="statistics__entry">
                     {name}
@@ -25,7 +25,7 @@ export default function Home() {
                     {date}
                   </div>
                 </div>
-              </>
+              </Fragment>
             );
           })}
       </div>
