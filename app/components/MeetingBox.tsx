@@ -13,7 +13,7 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
   // loading case
   if (!nextPairing) return null;
 
-  // not scheduled or partner can't make it
+  // not scheduled or partner rejected the meeting
   const partnerCanceled = meeting?.partnerStatus === 0;
   if (!meeting || partnerCanceled) {
     return (
@@ -24,7 +24,7 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
             the meeting.
           </p>
         ) : (
-          <p>Sorry, no meeting was able to be scheduled this week.</p>
+          <p>Sorry, no meeting was found for you.</p>
         )}
         <p>
           Your next meeting will be scheduled in {nextPairing} days.
