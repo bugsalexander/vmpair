@@ -12,9 +12,10 @@ export default function Home() {
   const [canAttend, setCanAttend] = useState(true);
 
   useEffect(() => {
-    ApiClient.getWelcome().then((data) => {
-      setData(data.data);
-      setCanAttend(!!data.data.willBeAttending);
+    ApiClient.getWelcome().then((req) => {
+      setData(req.data);
+      console.log(req.data);
+      setCanAttend(!!req.data.willBeAttending);
     });
   }, []);
 
