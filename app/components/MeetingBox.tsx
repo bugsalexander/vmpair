@@ -1,9 +1,8 @@
-import { differenceInDays } from "date-fns";
 import { WelcomeApiResponse } from "../common/types";
 
 type MeetingBoxProps = {
   meeting: WelcomeApiResponse["nextMeeting"] | undefined;
-  nextPairing: Date | undefined;
+  nextPairing: number | undefined;
 };
 
 export const MeetingBox: React.FC<MeetingBoxProps> = ({
@@ -17,8 +16,6 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
   // not scheduled or partner can't make it
   const partnerCanceled = meeting?.partnerStatus === 0;
   if (!meeting || partnerCanceled) {
-    const date = new Date(nextPairing);
-    const inDays = differenceInDays(new Date(), date);
     return (
       <div className="meetingbox">
         {partnerCanceled ? (
@@ -30,8 +27,7 @@ export const MeetingBox: React.FC<MeetingBoxProps> = ({
           <p>Sorry, no meeting was able to be scheduled this week.</p>
         )}
         <p>
-          Your next meeting will be scheduled in {inDays} days, on{" "}
-          {date.toString()}.
+          Your next meeting will be scheduled in {nextPairing} days.
         </p>
       </div>
     );

@@ -64,34 +64,39 @@ def get_welcome():
         result = mycursor.fetchall()
         print("the result of the first query is", result)
         name = result[0][0]
+        print(session['email'])
 
         # Query next meeting info from Meetings table using email
         mycursor.execute(f"select user_2_email, meeting_date, user_2_attending from meetings where user_1_email = '{session['email']}';")
         result = mycursor.fetchall()
+        mycursor.execute(f"select user_1_email, meeting_date, user_1_attending from meetings where user_2_email = '{session['email']}';")
+        result.extend(mycursor.fetchall())
         print("the result of the second query is", result)
-        (partnerEmail, nextMeetingTime, partnerStatus) = result[0]
+        if result != []:
+            (partnerEmail, nextMeetingTime, partnerStatus) = result[0]
+            print(nextMeetingTime.strftime("%m/%d/%Y"))
         
-        # Query partner's name from the Users table using their email
-        mycursor.execute(f"select full_name from users where email = '{partnerEmail}';")
-        result = mycursor.fetchall()
-        print("the result of the third query is", result)
-        partnerName = result[0][0]
+            # Query partner's name from the Users table using their email
+            mycursor.execute(f"select full_name from users where email = '{partnerEmail}';")
+            result = mycursor.fetchall()
+            print("the result of the third query is", result)
+            partnerName = result[0][0]
         
-        result = {
-            "name": name,
-            "nextMeeting": {
-                "partnerName": partnerName,
-                "time": nextMeetingTime.strftime("%m/%d/%Y"),
-                "partnerStatus": partnerStatus,
-            },
-            "nextPairing": 7 - datetime.now().weekday()
-        }
-        return Response(
-            json.dumps(result),
-            headers={"Access-Control-Allow-Origin": "*"},
-            status=200,
-            mimetype='application/json'
-        )
+            result = {
+                "name": name,
+                "nextMeeting": {
+                    "partnerName": partnerName,
+                    "time": nextMeetingTime.strftime("%m/%d/%Y"),
+                    "partnerStatus": partnerStatus,
+                },
+                "nextPairing": 7 - datetime.now().weekday()
+            }
+            return Response(
+                json.dumps(result),
+                headers={"Access-Control-Allow-Origin": "*"},
+                status=200,
+                mimetype='application/json'
+            )
 
 @app.route("/api/v1/welcome", methods=['POST'])
 def set_welcome():

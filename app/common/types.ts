@@ -9,7 +9,7 @@ export type WelcomeApiResponse = {
     time: string;
     partnerStatus: number;
   };
-  nextPairing: Date;
+  nextPairing: number;
   willBeAttending: boolean;
 };
 
