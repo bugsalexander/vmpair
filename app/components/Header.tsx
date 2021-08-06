@@ -1,5 +1,7 @@
 import { Button } from "antd";
 import { useRouter } from "next/dist/client/router";
+import { cleanCookies } from "universal-cookie/lib/utils";
+import ApiClient from "../common/apiClient";
 
 type HButtonProps = {
   isDefault?: boolean;
@@ -25,8 +27,15 @@ type HeaderProps = {
 export const Header: React.FC<HeaderProps> = ({ text, page }) => {
   const router = useRouter();
 
-  const onClick = (page: string) => () => {
-    router.push(page === "home" ? "/" : page);
+  const onClick = (page: string) => async () => {
+    if (page === "home") {
+      await router.push("/");
+    } else if (page === "login") {
+      await ApiClient.logout();
+      await router.push("/" + page);
+    } else {
+      await router.push(page);
+    }
   };
 
   return (

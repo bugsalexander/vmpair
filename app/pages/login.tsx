@@ -1,5 +1,3 @@
-import { Button, Checkbox, Input, Select, Switch } from "antd";
-import { Header } from "../components/Header";
 import { Subheader } from "../components/Subheader";
 import { LoginButton } from "../components/LoginButton";
 import { LoginFields } from "../components/LoginFields";
@@ -31,9 +29,9 @@ export default function Login() {
             Meet new coworkers over lunch!
           </div>
           <LoginFields onChange={setEmail} />
-          <LoginButton login onClick={() => {
-            ApiClient.login(email);
-            router.push("/");
+          <LoginButton login onClick={async () => {
+            await ApiClient.login(email);
+            await router.push("/");
           }}>Login</LoginButton>
           <Link href="/login" passHref>
               <div className="login__forgot_password">Forgot password?</div>

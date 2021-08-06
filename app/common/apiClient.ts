@@ -12,6 +12,7 @@ export const ROUTES = {
   WELCOME: "/api/v1/welcome",
   PREFERENCES: "/api/v1/preferences",
   STATS: "/api/v1/stats",
+  LOGOUT: "/api/v1/logout",
 };
 
 const baseURL =
@@ -37,6 +38,7 @@ const ApiClient = {
   postPreferences: (payload: PreferencesApiRequest) =>
     axios.post(ROUTES.PREFERENCES, payload, { baseURL }),
   login: (email: string) => axios.post(ROUTES.LOGIN, { email }, { baseURL }),
+  logout: () => axios.get(ROUTES.LOGOUT, { baseURL }),
 };
 
 export default ApiClient;
