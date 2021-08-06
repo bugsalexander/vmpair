@@ -11,16 +11,12 @@ export const LoginButton: React.FC<LoginButtonProps> = ({
   children,
   onClick,
 }) => {
-  const color = login ? "#1890ff" : "#2ec23f"
+  const color = login ? "blue" : "green"
   return (
     <Button
       type={"default"}
       onClick={onClick}
-      style={{ 
-        borderColor: color, 
-        color: "white",
-        backgroundColor: color,
-      }}
+      className={"login__button--" + color}
     >
       {children}
     </Button>

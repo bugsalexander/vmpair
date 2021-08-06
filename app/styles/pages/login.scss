@@ -40,4 +40,29 @@
       color: #1890ff;
     }
   }
+
+  &__button {
+
+    &--blue {
+      border-color: #1890ff;
+      background-color: #1890ff;
+      color: white;
+      &:hover {
+        border-color: #0880ef;
+        background-color: #0880ef;
+        color: white;
+      }
+    }
+
+    &--green {
+      border-color: #78be20;
+      background-color: #78be20;
+      color: white;
+      &:hover {
+        border-color: #68ae10;
+        background-color: #68ae10;
+        color: white;
+      }
+    }
+  }
 }

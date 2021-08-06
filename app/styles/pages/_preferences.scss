@@ -47,7 +47,14 @@
     margin-top: 1.5em;
 
     &__button {
-      margin-left: auto;
+      border-color: #78be20;
+      background-color: #78be20;
+      color: white;
+      &:hover {
+        border-color: #68ae10;
+        background-color: #68ae10;
+        color: white;
+      }
     }
   }
 }
