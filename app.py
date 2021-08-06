@@ -47,6 +47,7 @@ def get_welcome():
         date: DateTime
         partnerStatus: string
     nextPairing: DateTime
+    willBeAttending: boolean
     '''
     with mysql.connector.connect(host='localhost', user='root', port=3307, password='root', database='test_db') as mydb:
         mycursor = mydb.cursor()
@@ -61,19 +62,19 @@ def get_welcome():
 
         # Query next meeting info from Meetings table using email
         mycursor = mydb.cursor()
-        mycursor.execute(f'''SELECT user_2_email AS partner_email, meeting_date, user_2_attending AS partner_status
+        mycursor.execute(f'''SELECT user_2_email AS partner_email, meeting_date, user_2_attending AS partner_status, user_1_attending as my_status
         FROM meetings
         WHERE user_1_email = '{session['email']}' AND meeting_date > CURDATE() 
         
         UNION 
         
-        SELECT user_1_email AS partner_email, meeting_date, user_1_attending AS partner_status
+        SELECT user_1_email AS partner_email, meeting_date, user_1_attending AS partner_status, user_2_attending as my_status
         FROM meetings
         WHERE user_2_email = '{session['email']}' AND meeting_date > CURDATE();''')
 
         next_meeting_info = mycursor.fetchone()
         if next_meeting_info != None:
-            partnerEmail, nextMeetingTime, partnerStatus = next_meeting_info
+            partnerEmail, nextMeetingTime, partnerStatus, my_status = next_meeting_info
         
             # Query partner's name from the Users table using their email
             mycursor.execute(f"SELECT full_name FROM users WHERE email = '{partnerEmail}';")
@@ -85,6 +86,8 @@ def get_welcome():
                     "time": nextMeetingTime.strftime("%m/%d/%Y"),
                     "partnerStatus": partnerStatus,
                     }
+            
+            result["willBeAttending"] = my_status
 
         return Response(
             json.dumps(result),
